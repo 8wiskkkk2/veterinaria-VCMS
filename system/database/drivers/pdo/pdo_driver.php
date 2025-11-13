@@ -67,6 +67,12 @@ class CI_DB_pdo_driver extends CI_DB {
 	 */
 	public $options = array();
 
+	/**
+	 * Compatibility flags set from config params
+	 */
+	public $compress = FALSE;
+	public $stricton;
+
 	// --------------------------------------------------------------------
 
 	/**

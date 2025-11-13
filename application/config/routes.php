@@ -50,3 +50,4 @@ $route['veterinario/vacunas/guardar'] = 'veterinario/vacunas_guardar';
 $route['veterinario/desparacitaciones'] = 'veterinario/desparacitaciones/index';
 $route['veterinario/desparacitaciones/crear'] = 'veterinario/desparacitaciones/crear';
 $route['veterinario/desparacitaciones/guardar'] = 'veterinario/desparacitaciones/guardar';
+$route['setup/db_init'] = 'setup/db_init';

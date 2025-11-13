@@ -73,24 +73,52 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $active_group = 'default';
 $query_builder = TRUE;
 
+// Permite configurar la conexión vía variables de entorno (ideal para RDS)
+$db_host     = getenv('DB_HOST') ?: 'veterinaria-vcms-instance-1.clvlgblzviug.us-east-1.rds.amazonaws.com';
+$db_port     = getenv('DB_PORT') ?: '3306';
+$db_name     = getenv('DB_NAME') ?: 'veterinaria_VCMS';
+$db_user     = getenv('DB_USER') ?: 'ci_user';
+$db_pass     = getenv('DB_PASS') ?: 'veterinaria_vcms';
+$db_charset  = getenv('DB_CHARSET') ?: 'utf8';
+$db_collat   = getenv('DB_COLLATION') ?: 'utf8_general_ci';
+$db_ssl_ca   = getenv('DB_SSL_CA') ?: '';
+$db_ssl_verify = getenv('DB_SSL_VERIFY'); // '1' para verificar, '0' para desactivar
+
+$dsn = 'mysql:host=' . $db_host . ';port=' . $db_port . ';dbname=' . $db_name . ';charset=' . $db_charset;
+
+$encrypt = FALSE;
+if (!empty($db_ssl_ca)) {
+    // Si se provee CA para RDS, activamos opciones SSL
+    $encrypt = array(
+        'ssl_ca' => $db_ssl_ca,
+        'ssl_verify' => ($db_ssl_verify === '0') ? FALSE : TRUE,
+    );
+}
+
 $db['default'] = array(
-    'dsn'   => '',
-    'hostname' => 'localhost',
-    'username' => 'root',
-    'password' => '',
-    'database' => 'db_veterinaria',  
-    'dbdriver' => 'mysqli',
+    // Usamos PDO MySQL con charset explícito para evitar el bug de charset 255
+    'dsn'      => $dsn,
+    'hostname' => $db_host,
+    'username' => $db_user,
+    'password' => $db_pass,
+    'database' => $db_name,
+    'dbdriver' => 'pdo',
+    'subdriver' => 'mysql',
     'dbprefix' => '',
     'pconnect' => FALSE,
     'db_debug' => (ENVIRONMENT !== 'production'),
     'cache_on' => FALSE,
     'cachedir' => '',
-    'char_set' => 'utf8',
-    'dbcollat' => 'utf8_general_ci',
+    'char_set' => $db_charset,
+    'dbcollat' => $db_collat,
     'swap_pre' => '',
-    'encrypt' => FALSE,
+    'encrypt'  => $encrypt,
     'compress' => FALSE,
     'stricton' => FALSE,
+    // Asegura el charset en el handshake inicial
+    'options'  => array(
+        PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . $db_charset
+    ),
     'failover' => array(),
     'save_queries' => TRUE
 );
