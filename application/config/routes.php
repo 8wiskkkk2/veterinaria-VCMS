@@ -51,3 +51,12 @@ $route['veterinario/desparacitaciones'] = 'veterinario/desparacitaciones/index';
 $route['veterinario/desparacitaciones/crear'] = 'veterinario/desparacitaciones/crear';
 $route['veterinario/desparacitaciones/guardar'] = 'veterinario/desparacitaciones/guardar';
 $route['setup/db_init'] = 'setup/db_init';
+
+// Admin tratamientos
+$route['admin/catalogos'] = 'admin/catalogos';
+$route['admin/tratamientos'] = 'admin/catalogos';
+$route['admin/especies'] = 'admin/especies';
+$route['admin/raza/guardar'] = 'admin/raza_guardar';
+$route['admin/vacuna_tipo/guardar'] = 'admin/vacuna_tipo_guardar';
+$route['admin/desparacitacion_tipo/guardar'] = 'admin/desparacitacion_tipo_guardar';
+$route['admin/especie/guardar'] = 'admin/especie_guardar';

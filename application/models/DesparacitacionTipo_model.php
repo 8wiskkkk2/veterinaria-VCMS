@@ -90,4 +90,19 @@ class DesparacitacionTipo_model extends CI_Model {
         $this->db->limit($limit);
         return $this->db->get()->result();
     }
+
+    public function insert_tipo($nombre, $dias_intervalo = 0, $especie = NULL) {
+        $data = array(
+            'nombre' => $nombre,
+            'dias_intervalo' => (int)$dias_intervalo,
+            'especie' => $especie ? strtolower($especie) : NULL,
+            'created_at' => date('Y-m-d H:i:s')
+        );
+        return $this->db->insert('desparacitacion_tipos', $data);
+    }
+
+    public function get_all() {
+        $this->db->order_by('nombre', 'ASC');
+        return $this->db->get('desparacitacion_tipos')->result();
+    }
 }

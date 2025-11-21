@@ -63,4 +63,21 @@ class Especie_model extends CI_Model {
         return $this->db->get('especies')->result();
     }
 
+    public function get_all() {
+        $this->db->order_by('nombre', 'ASC');
+        return $this->db->get('especies')->result();
+    }
+
+    public function insert_especie($nombre) {
+        $nombre_norm = ucfirst(strtolower($nombre));
+        if ($this->exists_by_nombre($nombre_norm)) {
+            return false;
+        }
+        return $this->db->insert('especies', array('nombre' => $nombre_norm));
+    }
+
+    public function exists_by_nombre($nombre) {
+        return $this->db->where('nombre', $nombre)->count_all_results('especies') > 0;
+    }
+
 }

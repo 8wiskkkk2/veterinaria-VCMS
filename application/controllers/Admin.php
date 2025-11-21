@@ -33,6 +33,7 @@ class Admin extends MY_Controller {
     public function usuarios() {
         $data['titulo'] = 'Gestión de Usuarios';
         $data['usuarios'] = $this->User_model->get_all_users();
+        $data['current_user_id'] = $this->session->userdata('id');
         
         $this->load->view('admin/templates/header', $data);
         $this->load->view('admin/templates/navbar');
@@ -143,6 +144,11 @@ class Admin extends MY_Controller {
     }
 
     public function editar_usuario($id) {
+        if ($id == $this->session->userdata('id')) {
+            $this->session->set_flashdata('error', 'No puedes editar tu propio usuario desde esta sección');
+            redirect('admin/usuarios');
+            return;
+        }
         // Primero cargar las reglas de validación
         $this->form_validation->set_rules('nombre', 'Nombre', 'required');
         $this->form_validation->set_rules('email', 'Email', 'valid_email');
@@ -355,6 +361,101 @@ class Admin extends MY_Controller {
         $this->load->view('admin/templates/navbar');
         $this->load->view('admin/estadisticas/index', $data);
         $this->load->view('admin/templates/footer');
+    }
+
+    public function catalogos() {
+        $this->load->model('VacunaTipo_model');
+        $this->load->model('DesparacitacionTipo_model');
+        $this->load->model('Especie_model');
+
+        $this->VacunaTipo_model->ensure_table_and_seed();
+        $this->DesparacitacionTipo_model->ensure_table_and_seed();
+
+        $data['titulo'] = 'Tratamientos';
+        $data['vacuna_tipos'] = $this->VacunaTipo_model->get_all();
+        $data['desparacitacion_tipos'] = $this->DesparacitacionTipo_model->get_all();
+        $data['especies'] = $this->Especie_model->get_all();
+
+        $this->load->view('admin/templates/header', $data);
+        $this->load->view('admin/templates/navbar');
+        $this->load->view('admin/catalogos/index', $data);
+        $this->load->view('admin/templates/footer');
+    }
+
+
+    public function vacuna_tipo_guardar() {
+        if ($this->input->method() !== 'post') { redirect('admin/catalogos'); return; }
+        $this->load->model('VacunaTipo_model');
+        $nombre = trim($this->input->post('nombre'));
+        $dias = (int)$this->input->post('dias_intervalo');
+        $especie = $this->input->post('especie');
+        if (!$nombre) { $this->session->set_flashdata('error', 'Nombre de vacuna requerido'); redirect('admin/catalogos'); return; }
+        try {
+            $ok = $this->VacunaTipo_model->insert_tipo($nombre, $dias, ($especie === 'general' ? null : $especie));
+            $this->session->set_flashdata($ok ? 'success' : 'error', $ok ? 'Tipo de vacuna creado' : 'No se pudo crear el tipo de vacuna');
+        } catch (Exception $e) {
+            $this->session->set_flashdata('error', 'Error: ' . $e->getMessage());
+        }
+        redirect('admin/catalogos');
+    }
+
+    public function desparacitacion_tipo_guardar() {
+        if ($this->input->method() !== 'post') { redirect('admin/catalogos'); return; }
+        $this->load->model('DesparacitacionTipo_model');
+        $nombre = trim($this->input->post('nombre'));
+        $dias = (int)$this->input->post('dias_intervalo');
+        $especie = $this->input->post('especie');
+        if (!$nombre) { $this->session->set_flashdata('error', 'Nombre de tratamiento requerido'); redirect('admin/catalogos'); return; }
+        try {
+            $ok = $this->DesparacitacionTipo_model->insert_tipo($nombre, $dias, ($especie === 'general' ? null : $especie));
+            $this->session->set_flashdata($ok ? 'success' : 'error', $ok ? 'Tipo de desparasitación creado' : 'No se pudo crear el tipo');
+        } catch (Exception $e) {
+            $this->session->set_flashdata('error', 'Error: ' . $e->getMessage());
+        }
+        redirect('admin/catalogos');
+    }
+
+    public function especie_guardar() {
+        if ($this->input->method() !== 'post') { redirect('admin/especies'); return; }
+        $this->load->model('Especie_model');
+        $nombre = trim($this->input->post('nombre'));
+        if (!$nombre) { $this->session->set_flashdata('error', 'Nombre de especie requerido'); redirect('admin/especies'); return; }
+        if ($this->Especie_model->exists_by_nombre(ucfirst(strtolower($nombre)))) {
+            $this->session->set_flashdata('error', 'Esa especie ya está creada');
+            redirect('admin/especies');
+            return;
+        }
+        $ok = $this->Especie_model->insert_especie($nombre);
+        $this->session->set_flashdata($ok ? 'success' : 'error', $ok ? 'Especie creada' : 'No se pudo crear la especie');
+        redirect('admin/especies');
+    }
+
+    public function especies() {
+        $this->load->model('Especie_model');
+        $this->load->model('Raza_model');
+        $data['titulo'] = 'Especies';
+        $data['especies'] = $this->Especie_model->get_all();
+        $data['razas'] = $this->Raza_model->buscar_razas_por_especie(null);
+        $this->load->view('admin/templates/header', $data);
+        $this->load->view('admin/templates/navbar');
+        $this->load->view('admin/especies/index', $data);
+        $this->load->view('admin/templates/footer');
+    }
+
+    public function raza_guardar() {
+        if ($this->input->method() !== 'post') { redirect('admin/especies'); return; }
+        $this->load->model('Raza_model');
+        $especie_id = (int)$this->input->post('especie_id');
+        $nombre = trim($this->input->post('nombre'));
+        if (!$especie_id || !$nombre) { $this->session->set_flashdata('error', 'Especie y nombre requeridos'); redirect('admin/especies'); return; }
+        if ($this->Raza_model->exists_by_nombre_especie($especie_id, ucfirst(strtolower($nombre)))) {
+            $this->session->set_flashdata('error', 'Esa raza ya está creada para esa especie');
+            redirect('admin/especies');
+            return;
+        }
+        $ok = $this->Raza_model->insert_raza($especie_id, $nombre);
+        $this->session->set_flashdata($ok ? 'success' : 'error', $ok ? 'Raza creada' : 'No se pudo crear la raza');
+        redirect('admin/especies');
     }
     
     public function buscar_usuarios() {

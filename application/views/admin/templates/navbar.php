@@ -20,11 +20,20 @@
                 </li>
                 <?php if($this->session->userdata('role') === 'administrador'): ?>
                     <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('admin/especies') ?>">
+                            <i class="fas fa-paw me-1"></i>Especies
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="<?= base_url('admin/catalogos') ?>">
+                            <i class="fas fa-syringe me-1"></i>Tratamientos
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="<?= base_url('admin/estadisticas') ?>">
                             <i class="fas fa-chart-bar me-1"></i>Estadísticas
                         </a>
                     </li>
-
                 <?php endif; ?>
             </ul>
             <ul class="navbar-nav">

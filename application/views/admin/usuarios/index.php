@@ -84,13 +84,18 @@
                                             </span>
                                         </td>
                                         <td>
-                                            <a href="<?= base_url('admin/editar_usuario/'.$usuario->id) ?>" class="btn btn-sm btn-warning">
-                                                <i class="fas fa-edit"></i> Editar
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger" 
-                                                    onclick="confirmarEliminacion(<?= $usuario->id ?>, '<?= $usuario->nombre ?>')">
-                                                <i class="fas fa-trash"></i> Eliminar
-                                            </button>
+                                            <?php $isSelf = isset($current_user_id) && ($usuario->id == $current_user_id); ?>
+                                            <?php if(!$isSelf): ?>
+                                                <a href="<?= base_url('admin/editar_usuario/'.$usuario->id) ?>" class="btn btn-sm btn-warning">
+                                                    <i class="fas fa-edit"></i> Editar
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-danger" 
+                                                        onclick="confirmarEliminacion(<?= $usuario->id ?>, '<?= $usuario->nombre ?>')">
+                                                    <i class="fas fa-trash"></i> Eliminar
+                                                </button>
+                                            <?php else: ?>
+                                                <span class="text-muted">No disponible</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

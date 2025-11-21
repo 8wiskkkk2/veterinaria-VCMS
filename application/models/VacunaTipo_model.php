@@ -147,4 +147,9 @@ class VacunaTipo_model extends CI_Model {
             'especie' => $especie ? strtolower($especie) : null
         ]);
     }
+
+    public function get_all() {
+        $this->db->order_by('nombre', 'ASC');
+        return $this->db->get('vacuna_tipos')->result();
+    }
 }

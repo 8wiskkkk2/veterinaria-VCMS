@@ -23,9 +23,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://localhost:8000/';
+$config['base_url'] = 'http://184.72.161.125/';
 
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
 $config['uri_protocol'] = 'REQUEST_URI';
 
 // Remove or comment out this duplicate line
