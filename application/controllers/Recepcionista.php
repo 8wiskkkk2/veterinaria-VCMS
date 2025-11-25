@@ -383,9 +383,17 @@ class Recepcionista extends CI_Controller {
     }
 
     public function buscar_propietarios() {
-        $rut = $this->input->post('rut');
-        $this->db->like('rut', $rut);
-        $query = $this->db->get('users');
+        $q = $this->input->post('query');
+        if (!$q) {
+            $q = $this->input->post('rut');
+        }
+        $this->db->from('users');
+        $this->db->group_start();
+        $this->db->like('nombre', $q);
+        $this->db->or_like('rut', $q);
+        $this->db->group_end();
+        $this->db->limit(10);
+        $query = $this->db->get();
         echo json_encode($query->result());
     }
 
@@ -396,12 +404,13 @@ class Recepcionista extends CI_Controller {
         }
     
         $query = $this->input->post('query');
+        $propietario_id = $this->input->post('propietario_id');
         
         // Cargar el modelo si aún no está cargado
         $this->load->model('Mascota_model');
         
         // Realizar la búsqueda
-        $mascotas = $this->Mascota_model->buscar_mascotas($query);
+        $mascotas = $this->Mascota_model->buscar_mascotas($query, $propietario_id);
         
         // Devolver los resultados como JSON
         echo json_encode($mascotas);

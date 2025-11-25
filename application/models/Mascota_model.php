@@ -7,13 +7,17 @@ class Mascota_model extends CI_Model {
         parent::__construct();
     }
 
-    public function buscar_mascotas($query) {
+    public function buscar_mascotas($query, $propietario_id = null) {
         $this->db->select('mascotas.id, mascotas.nombre, mascotas.especie, mascotas.raza, 
                            mascotas.edad_aproximada, mascotas.sexo, mascotas.color, mascotas.peso,
+                           mascotas.usuario_id as propietario_id,
                            users.nombre as nombre_propietario, users.rut as rut_propietario,
                            users.telefono as telefono_propietario, users.direccion as direccion_propietario');
         $this->db->from('mascotas');
         $this->db->join('users', 'users.id = mascotas.usuario_id', 'left');
+        if ($propietario_id) {
+            $this->db->where('mascotas.usuario_id', (int)$propietario_id);
+        }
         $this->db->group_start()
             ->like('mascotas.nombre', $query)
             ->or_like('mascotas.especie', $query)

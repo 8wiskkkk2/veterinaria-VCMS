@@ -333,6 +333,7 @@
                                             
                                             if(nombreCompleto.includes(searchQuery) || rut.includes(searchQuery)) {
                                                 html += `<div class="list-group-item list-group-item-action cursor-pointer propietario-item" 
+                                                        data-id="${propietario.id}"
                                                         data-rut="${propietario.rut}" 
                                                         data-nombre="${propietario.nombre}"
                                                         data-direccion="${propietario.direccion}"
@@ -379,13 +380,15 @@
     $('#buscar_mascota').on('input', function() {
         clearTimeout(timeoutId);
         const query = $(this).val().trim();
+        const propietarioId = $('#id_propietario').val();
+        if(!propietarioId) { $('#resultados_mascotas').hide(); return; }
         
         if(query.length >= 2) {
             timeoutId = setTimeout(function() {
                 $.ajax({
                     url: '<?= base_url('recepcionista/buscar_mascotas') ?>',
                     method: 'POST',
-                    data: { query: query },
+                    data: { query: query, propietario_id: $('#id_propietario').val() },
                     success: function(response) {
                         try {
                             const mascotas = JSON.parse(response);
@@ -468,13 +471,15 @@
     $('#buscar_mascota').on('input', function() {
         clearTimeout(timeoutId);
         const query = $(this).val().trim();
+        const propietarioId = $('#id_propietario').val();
+        if(!propietarioId) { $('#resultados_mascotas').hide(); return; }
         
         if(query.length >= 2) {
             timeoutId = setTimeout(function() {
                 $.ajax({
                     url: '<?= base_url('recepcionista/buscar_mascotas') ?>',
                     method: 'POST',
-                    data: { query: query },
+                    data: { query: query, propietario_id: $('#id_propietario').val() },
                     success: function(response) {
                         try {
                             const mascotas = JSON.parse(response);
